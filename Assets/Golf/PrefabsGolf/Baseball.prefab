@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06def367388f2841b51971219bd1217, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.SpawnRocks.RockSpawnSettings
-  minIntervalSeconds: 0.3
+  minIntervalSeconds: 0.5
   maxIntervalSeconds: 5
   maxIntervalDecreaseMilliseconds: 100
 --- !u!54 &7315748075572528457

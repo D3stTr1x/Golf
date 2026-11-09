@@ -1,4 +1,1 @@
 # Golf
-
-[Uploading GolfParty.apk…]()
-

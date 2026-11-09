@@ -1,7 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using System.Collections;
 using System.Collections.Generic;
 using Golf.ScriptsGolf.SpawnRocks;
 using Golf.ScriptsGolf.ShootScripts;
+using TMPro;
+
+
 
 namespace Golf.ScriptsGolf
 {
@@ -20,6 +27,7 @@ namespace Golf.ScriptsGolf
         [SerializeField] private LayerMask m_rockLayer;
         [SerializeField] private float m_hitForce = 8f;
         [SerializeField] private float m_upwardForce = 1.5f;
+        [SerializeField] private Button m_shootButton;
 
         [Header("Направление удара")]
         [Tooltip("Мировая ось, вдоль которой мотыга движется вперёд при ударе")]
@@ -29,6 +37,17 @@ namespace Golf.ScriptsGolf
         [Tooltip("0..1, чем больше, тем меньше сглаживание скорости")]
         [SerializeField, Range(0f, 1f)] private float m_velocitySmoothing = 0.5f;
 
+        [Header("Счётчик")]
+        [SerializeField] private TMP_Text m_pointCount;
+        private int m_point = 0;
+
+        [Header("Конец игры")]
+        [SerializeField] private string m_menuSceneName = "Menu";
+        [SerializeField] private float m_gameOverDelay = 1.5f;
+
+        private const string BestScoreKey = "BestScore";
+        private bool m_isGameOver;
+
         private readonly HashSet<int> m_hitRocks = new HashSet<int>();
 
         private IGameState m_currentState;
@@ -37,9 +56,19 @@ namespace Golf.ScriptsGolf
         private Vector3 m_prevHeadPos;
         private Vector3 m_headVelocity;
         private bool m_hasPrevPos;
+        
 
         private void Awake()
         {
+            Time.timeScale = 1f;
+
+            if (m_pointCount == null)
+            {
+                Debug.LogError(
+                    "GameManager: назначьте TMP_Text(Очки) в Inspector."
+                );
+            }
+
             if (m_player == null && m_playerAnimator != null)
             {
                 m_player = m_playerAnimator.transform;
@@ -62,6 +91,8 @@ namespace Golf.ScriptsGolf
                 );
             }
 
+            SetupShootButton();
+
             ChangeState(new GamePlayState(this));
         }
 
@@ -72,16 +103,67 @@ namespace Golf.ScriptsGolf
                 return;
             }
 
-            if (Input.GetMouseButtonDown(0))
+        #if UNITY_EDITOR || UNITY_STANDALONE
+            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             {
-                m_hitRocks.Clear();
-                m_golfShootAnimation.Press();
+                OnShootPressed();
             }
 
             if (Input.GetMouseButtonUp(0))
             {
-                m_golfShootAnimation.Release();
+                OnShootReleased();
             }
+        #endif
+        }
+
+        private bool IsPointerOverUI()
+        {
+            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        }
+
+        private void SetupShootButton()
+        {
+            if (m_shootButton == null)
+            {
+                return;
+            }
+
+            EventTrigger trigger = m_shootButton.GetComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                trigger = m_shootButton.gameObject.AddComponent<EventTrigger>();
+            }
+
+            AddTrigger(trigger, EventTriggerType.PointerDown, OnShootPressed);
+            AddTrigger(trigger, EventTriggerType.PointerUp, OnShootReleased);
+        }
+
+        private static void AddTrigger(EventTrigger trigger, EventTriggerType type, UnityEngine.Events.UnityAction action)
+        {
+            EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
+            entry.callback.AddListener(_ => action());
+            trigger.triggers.Add(entry);
+        }
+
+        public void OnShootPressed()
+        {
+            if (m_isGameOver || m_golfShootAnimation == null)
+            {
+                return;
+            }
+
+            m_hitRocks.Clear();
+            m_golfShootAnimation.Press();
+        }
+
+        public void OnShootReleased()
+        {
+            if (m_golfShootAnimation == null)
+            {
+                return;
+            }
+
+            m_golfShootAnimation.Release();
         }
 
         private void LateUpdate()
@@ -112,7 +194,7 @@ namespace Golf.ScriptsGolf
 
         private void FixedUpdate()
         {
-            if (m_golfShootAnimation == null ||
+            if (m_isGameOver || m_golfShootAnimation == null ||
                 !m_golfShootAnimation.IsPlaying ||
                 m_hoeHeadCollider == null)
             {
@@ -150,6 +232,13 @@ namespace Golf.ScriptsGolf
                 if (!m_hitRocks.Add(rockBody.GetInstanceID()))
                 {
                     continue;
+                }
+
+                RockSpawnSettings isTouchBall = rockBody.GetComponentInParent<RockSpawnSettings>();
+
+                if (isTouchBall != null)
+                {
+                    isTouchBall.isTouch = true;
                 }
 
                 rockBody.AddForce(hitDir * m_hitForce, ForceMode.Impulse);
@@ -196,6 +285,90 @@ namespace Golf.ScriptsGolf
                     m_manager.StopCoroutine(m_spawnRoutine);
                 }
             }
+        }
+
+        private class GameOverState : IGameState
+        {
+            private readonly GameManager m_manager;
+
+            public GameOverState(GameManager manager)
+            {
+                m_manager = manager;
+            }
+
+            public void Enter()
+            {
+                m_manager.m_isGameOver = true;
+                m_manager.SaveScore();
+
+                if (m_manager.m_shootButton != null)
+                {
+                    m_manager.m_shootButton.interactable = false;
+                }
+
+                Time.timeScale = 0f;
+                m_manager.StartCoroutine(LoadMenu());
+            }
+
+            public void Exit() { }
+
+            private IEnumerator LoadMenu()
+            {
+                yield return new WaitForSecondsRealtime(m_manager.m_gameOverDelay);
+
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(m_manager.m_menuSceneName);
+            }
+        }
+
+        private void OnEnable()
+        {
+            GameEvents.GameOver += HandleGameOver;
+            GameEvents.PinataHit += AddPoint;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.GameOver -= HandleGameOver;
+            GameEvents.PinataHit -= AddPoint;
+        }
+
+        private void HandleGameOver()
+        {
+            if (m_isGameOver)
+            {
+                return;
+            }
+
+            ChangeState(new GameOverState(this));
+        }
+
+        private void AddPoint()
+        {
+            if (m_isGameOver)
+            {
+                return;
+            }
+
+            m_point++;
+            
+            if (m_pointCount != null)
+            {
+                m_pointCount.text = $"Счёт: {m_point}";
+            }
+        }
+
+        private void SaveScore()
+        {
+            int best = PlayerPrefs.GetInt(BestScoreKey, 0);
+
+            if (m_point > best)
+            {
+                PlayerPrefs.SetInt(BestScoreKey, m_point);
+            }
+
+            PlayerPrefs.SetInt("LastScore", m_point);
+            PlayerPrefs.Save();
         }
     }
 }

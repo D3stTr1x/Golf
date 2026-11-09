@@ -1,14 +1,34 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 namespace Golf.ScriptsGolf.Buttons
 {
     public class MenuButton : MonoBehaviour
     {
-        [SerializeField] private string sceneName = "GameScene";
-        [SerializeField] private string menuSceneName = "Menu";
+        [SerializeField] private string m_sceneName = "GameScene";
+        [SerializeField] private string m_menuSceneName = "Menu";
+
+        [SerializeField] private TMP_Text m_scoreText;
 
         private string scene;
+
+        private const string BestScoreKey = "BestScore";
+        private const string LastScoreKey = "LastScore";
+
+        private void Awake()
+        {
+            if (m_scoreText == null)
+            {
+                Debug.LogError("Назначьте Score TMP_Text в Inspector");
+                return;
+            }
+
+            int best = PlayerPrefs.GetInt(BestScoreKey, 0);
+            int last = PlayerPrefs.GetInt(LastScoreKey, 0);
+
+            m_scoreText.text = $"Рекорд: {best}\nПоследний: {last}";
+        }
 
         private void Update()
         {
@@ -41,12 +61,12 @@ namespace Golf.ScriptsGolf.Buttons
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            SceneManager.LoadScene(menuSceneName);
+            SceneManager.LoadScene(m_menuSceneName);
         }
 
         public void LoadScene()
         {
-            SceneManager.LoadScene(sceneName);
+            SceneManager.LoadScene(m_sceneName);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }

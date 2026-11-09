@@ -26,7 +26,8 @@ namespace Golf.ScriptsGolf.SpawnRocks
                 RockSpawnSettings settings = rockPrefabs[i].GetComponent<RockSpawnSettings>();
 
                 if (settings != null)
-                {    currentMax[i] = Mathf.Max(settings.minIntervalSeconds, settings.maxIntervalSeconds);
+                {    
+                    currentMax[i] = Mathf.Max(settings.minIntervalSeconds, settings.maxIntervalSeconds);
                 }
             }
 
@@ -36,11 +37,15 @@ namespace Golf.ScriptsGolf.SpawnRocks
                 {
                     GameObject prefab = rockPrefabs[i];
                     if (prefab == null)
+                    {
                         continue;
+                    }
 
                     RockSpawnSettings settings = prefab.GetComponent<RockSpawnSettings>();
                     if (settings == null)
+                    {
                         continue;
+                    }
 
                     float min = Mathf.Max(0f, settings.minIntervalSeconds);
                     float interval = Random.Range(min, Mathf.Max(min, currentMax[i]));

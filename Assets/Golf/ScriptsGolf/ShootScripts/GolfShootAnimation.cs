@@ -71,8 +71,7 @@ namespace Golf.ScriptsGolf.ShootScripts
                 yield return null;
             }
 
-            AnimatorStateInfo state =
-                m_animator.GetCurrentAnimatorStateInfo(0);
+            AnimatorStateInfo state = m_animator.GetCurrentAnimatorStateInfo(0);
 
             while (state.IsName(m_shootStateName) && state.normalizedTime < 1f)
             {

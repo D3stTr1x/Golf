@@ -163,5 +163,29 @@ namespace Golf.ScriptsGolf.Buttons
                 }
             }
         }
+
+        /*public void StopStartSound()
+        {
+            if (soundController != null)
+            {
+                if (soundController.isPlaying)
+                    soundController.Stop();
+                soundController.enabled = !soundController.enabled;
+                musicScript.enabled = !musicScript.enabled;
+                Debug.Log("Car Audio Controller òåïåðü: " + soundController.enabled);
+            }
+        }
+
+        public void StopStartMusic()
+        {
+            if (musicController != null)
+            {
+                if (musicController.isPlaying)
+                    musicController.Stop();
+                musicController.enabled = !musicController.enabled;
+                Debug.Log("Car Audio Controller òåïåðü: " + musicController.enabled);
+            }
+        }
+        */
     }
 }

@@ -21,6 +21,8 @@ namespace Golf.ScriptsGolf.Buttons
         [SerializeField] private GameObject[] m_lights;
         [SerializeField] private Light m_addLight;
 
+        //private AudioSource soundController;
+        //private AudioSource musicController;
 
         private string scene;
 

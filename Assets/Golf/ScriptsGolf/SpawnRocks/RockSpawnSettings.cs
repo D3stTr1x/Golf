@@ -24,5 +24,16 @@ namespace Golf.ScriptsGolf.SpawnRocks
                 GameEvents.RaiseGameOver();
             }
         }
+
+        public void ChangeDifficulty()
+        {
+            minIntervalSeconds -= 0.2f;
+        }
+
+
+        private void Start()
+        {
+            GameEvents.RaiseRockSpawned(transform);
+        }
     }
 }

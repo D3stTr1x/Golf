@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Golf.ScriptsGolf.SpawnRocks;
 using Golf.ScriptsGolf.ShootScripts;
+using Golf.ScriptsGolf.UI;
 using TMPro;
 
 
@@ -17,6 +18,7 @@ namespace Golf.ScriptsGolf
         [Header("Спавн камней")]
         [SerializeField] private GameObject[] m_rockPrefabs;
         [SerializeField] private Transform m_spawnPoint;
+        [SerializeField] private RockSpawnSettings[] m_prefabSettings;
 
         [Header("Игрок")]
         [SerializeField] private Animator m_playerAnimator;
@@ -45,6 +47,14 @@ namespace Golf.ScriptsGolf
         [SerializeField] private string m_menuSceneName = "Menu";
         [SerializeField] private float m_gameOverDelay = 1.5f;
 
+        [Header("Индикатор мяча")]
+        [SerializeField] private Slider m_indicatorSlider;
+        [SerializeField] private float m_indicatorTopY = 4.49f;
+        [SerializeField] private float m_indicatorBottomY = 0.5f;
+        [SerializeField] private BallIndicatorZone[] m_indicatorZones;
+
+        private BallIndicator m_indicator;
+
         private const string BestScoreKey = "BestScore";
         private bool m_isGameOver;
 
@@ -61,17 +71,23 @@ namespace Golf.ScriptsGolf
         private void Awake()
         {
             Time.timeScale = 1f;
+            m_prefabSettings = new RockSpawnSettings[m_rockPrefabs.Length];
+
+            for (int i = 0; i < m_rockPrefabs.Length; i++)
+            {
+                if (m_rockPrefabs[i] == null)
+                {
+                    continue;
+                }
+
+                m_prefabSettings[i] = m_rockPrefabs[i].GetComponent<RockSpawnSettings>();
+            }
 
             if (m_pointCount == null)
             {
                 Debug.LogError(
                     "GameManager: назначьте TMP_Text(Очки) в Inspector."
                 );
-            }
-
-            if (m_player == null && m_playerAnimator != null)
-            {
-                m_player = m_playerAnimator.transform;
             }
 
             if (m_playerAnimator != null && m_player != null)
@@ -93,11 +109,19 @@ namespace Golf.ScriptsGolf
 
             SetupShootButton();
 
+            if (m_indicatorSlider != null)
+            {
+                m_indicator = new BallIndicator(
+                    m_indicatorSlider, m_indicatorTopY, m_indicatorBottomY, m_indicatorZones);
+            }
+
             ChangeState(new GamePlayState(this));
         }
 
         private void Update()
         {
+            m_indicator?.Tick();
+
             if (m_golfShootAnimation == null)
             {
                 return;
@@ -152,6 +176,7 @@ namespace Golf.ScriptsGolf
                 return;
             }
 
+            m_indicator?.Freeze();
             m_hitRocks.Clear();
             m_golfShootAnimation.Press();
         }
@@ -194,17 +219,7 @@ namespace Golf.ScriptsGolf
 
         private void FixedUpdate()
         {
-            if (m_isGameOver || m_golfShootAnimation == null ||
-                !m_golfShootAnimation.IsPlaying ||
-                m_hoeHeadCollider == null)
-            {
-                return;
-            }
-
-            Vector3 swingDir = m_swingDirection.normalized;
-
-            // Бьём только при движении вперёд: назад и в паузе скорость меньше порога.
-            if (Vector3.Dot(m_headVelocity, swingDir) < m_minHitSpeed)
+            if (m_isGameOver || m_hoeHeadCollider == null)
             {
                 return;
             }
@@ -217,6 +232,28 @@ namespace Golf.ScriptsGolf
                 m_rockLayer,
                 QueryTriggerInteraction.Ignore
             );
+
+            foreach (Collider hit in hits)
+            {
+                RockSpawnSettings rock = hit.GetComponentInParent<RockSpawnSettings>();
+                if (rock != null)
+                {
+                    rock.isTouch = true;
+                }
+            }
+
+            if (m_golfShootAnimation == null ||
+                !m_golfShootAnimation.IsPlaying)
+            {
+                return;
+            }
+
+            Vector3 swingDir = m_swingDirection.normalized;
+
+            if (Vector3.Dot(m_headVelocity, swingDir) < m_minHitSpeed)
+            {
+                return;
+            }
 
             Vector3 hitDir = (swingDir + Vector3.up * m_upwardForce).normalized;
 
@@ -307,6 +344,7 @@ namespace Golf.ScriptsGolf
                 }
 
                 Time.timeScale = 0f;
+                m_manager.m_indicator?.Clear();
                 m_manager.StartCoroutine(LoadMenu());
             }
 
@@ -325,12 +363,19 @@ namespace Golf.ScriptsGolf
         {
             GameEvents.GameOver += HandleGameOver;
             GameEvents.PinataHit += AddPoint;
+            GameEvents.RockSpawned += OnRockSpawned;
         }
 
         private void OnDisable()
         {
             GameEvents.GameOver -= HandleGameOver;
             GameEvents.PinataHit -= AddPoint;
+            GameEvents.RockSpawned -= OnRockSpawned;
+        }
+
+        private void OnRockSpawned(Transform rock)
+        {
+            m_indicator?.Track(rock);
         }
 
         private void HandleGameOver()
@@ -355,6 +400,17 @@ namespace Golf.ScriptsGolf
             if (m_pointCount != null)
             {
                 m_pointCount.text = $"Счёт: {m_point}";
+            }
+            
+            if (m_point % 25 == 0)
+            {
+                foreach (RockSpawnSettings settings in m_prefabSettings)
+                {
+                    if (settings != null && settings.minIntervalSeconds > 0.4)
+                    {
+                        settings.ChangeDifficulty();
+                    }
+                }
             }
         }
 

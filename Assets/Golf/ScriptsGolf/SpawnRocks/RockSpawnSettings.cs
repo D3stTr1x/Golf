@@ -27,7 +27,7 @@ namespace Golf.ScriptsGolf.SpawnRocks
 
         public void ChangeDifficulty()
         {
-            minIntervalSeconds -= 0.2f;
+            minIntervalSeconds -= 0.05f;
         }
 
 

@@ -402,11 +402,11 @@ namespace Golf.ScriptsGolf
                 m_pointCount.text = $"Счёт: {m_point}";
             }
             
-            if (m_point % 25 == 0)
+            if (m_point % 10 == 0)
             {
                 foreach (RockSpawnSettings settings in m_prefabSettings)
                 {
-                    if (settings != null && settings.minIntervalSeconds > 0.4)
+                    if (settings != null && settings.minIntervalSeconds > 0.5)
                     {
                         settings.ChangeDifficulty();
                     }

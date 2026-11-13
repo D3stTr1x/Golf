@@ -8,6 +8,13 @@ namespace Golf.ScriptsGolf.Buttons
     {
         [SerializeField] private string m_sceneName = "GameScene";
         [SerializeField] private string m_menuSceneName = "Menu";
+        [SerializeField] private AudioSource m_music;
+        
+        private const string MusicKey = "MusicOn";
+        private const string LightKey = "LightOn";
+
+        private bool m_musicOn = true;
+        private bool m_lightOn = true;
 
         [SerializeField] private TMP_Text m_scoreText;
         [SerializeField] private GameObject m_menuBackgroud;
@@ -20,9 +27,6 @@ namespace Golf.ScriptsGolf.Buttons
 
         [SerializeField] private GameObject[] m_lights;
         [SerializeField] private Light m_addLight;
-
-        //private AudioSource soundController;
-        //private AudioSource musicController;
 
         private string scene;
 
@@ -39,6 +43,12 @@ namespace Golf.ScriptsGolf.Buttons
             {
                 m_scoreText.text = $"Рекорд: {best}\nПоследний: {last}";
             }
+
+            m_musicOn = PlayerPrefs.GetInt(MusicKey, 1) == 1;
+            m_lightOn = PlayerPrefs.GetInt(LightKey, 1) == 1;
+
+            ApplyMusic();
+            ApplyLight();
         }
 
         private void Update()
@@ -149,45 +159,44 @@ namespace Golf.ScriptsGolf.Buttons
             
         }
 
+        public void MusicSettings()
+        {
+            m_musicOn = !m_musicOn;
+            PlayerPrefs.SetInt(MusicKey, m_musicOn ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyMusic();
+        }
+
         public void LightSettings()
         {
-            foreach (GameObject light in m_lights)
+            m_lightOn = !m_lightOn;
+            PlayerPrefs.SetInt(LightKey, m_lightOn ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyLight();
+        }
+
+        private void ApplyMusic()
+        {
+            if (m_music != null)
             {
-                if (light.gameObject.activeSelf)
-                {
-                    light.gameObject.SetActive(false);
-                    m_addLight.range = 5f;
-                }
-                else
-                {
-                    light.gameObject.SetActive(true);
-                    m_addLight.range = 10f;
-                }
+                m_music.mute = !m_musicOn;
             }
         }
 
-        /*public void StopStartSound()
+        private void ApplyLight()
         {
-            if (soundController != null)
+            foreach (GameObject lamp in m_lights)
             {
-                if (soundController.isPlaying)
-                    soundController.Stop();
-                soundController.enabled = !soundController.enabled;
-                musicScript.enabled = !musicScript.enabled;
-                Debug.Log("Car Audio Controller òåïåðü: " + soundController.enabled);
+                if (lamp != null)
+                {
+                    lamp.SetActive(m_lightOn);
+                }
             }
-        }
 
-        public void StopStartMusic()
-        {
-            if (musicController != null)
+            if (m_addLight != null)
             {
-                if (musicController.isPlaying)
-                    musicController.Stop();
-                musicController.enabled = !musicController.enabled;
-                Debug.Log("Car Audio Controller òåïåðü: " + musicController.enabled);
+                m_addLight.range = m_lightOn ? 10f : 5f;
             }
         }
-        */
     }
 }

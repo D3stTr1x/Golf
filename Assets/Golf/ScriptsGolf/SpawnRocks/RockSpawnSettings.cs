@@ -4,7 +4,9 @@ namespace Golf.ScriptsGolf.SpawnRocks
 {
     public class RockSpawnSettings : MonoBehaviour
     {
-        [Min(0.3f)] public float minIntervalSeconds = 0.3f;
+        public event System.Action Collided;
+
+        [Min(0.3f)] public float minIntervalSeconds = 0.9f;
         [Min(0.4f)] public float maxIntervalSeconds = 5f;
         [Min(5f)] public float maxIntervalDecreaseMilliseconds = 100f;
         public bool isTouch = false;
@@ -21,19 +23,8 @@ namespace Golf.ScriptsGolf.SpawnRocks
 
             if (!isTouch && !other.isTouch)
             {
-                GameEvents.RaiseGameOver();
+                Collided?.Invoke();
             }
-        }
-
-        public void ChangeDifficulty()
-        {
-            minIntervalSeconds -= 0.05f;
-        }
-
-
-        private void Start()
-        {
-            GameEvents.RaiseRockSpawned(transform);
         }
     }
 }

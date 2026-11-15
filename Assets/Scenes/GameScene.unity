@@ -202,9 +202,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: MusicSettings
+      - m_Target: {fileID: 1013874023}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.SettingsToggles, Assembly-CSharp
+        m_MethodName: ToggleMusic
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -335,9 +335,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: ToMenu
+      - m_Target: {fileID: 1013874024}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.SceneLoader, Assembly-CSharp
+        m_MethodName: LoadMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2183,9 +2183,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: OpenMenu
+      - m_Target: {fileID: 1013874021}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.PauseMenu, Assembly-CSharp
+        m_MethodName: Pause
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2467,6 +2467,7 @@ GameObject:
   m_Component:
   - component: {fileID: 731973821}
   - component: {fileID: 731973822}
+  - component: {fileID: 731973823}
   m_Layer: 0
   m_Name: Audio Source
   m_TagString: Untagged
@@ -2586,6 +2587,29 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &731973823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731973820}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd591d6ae75cef14cb739e833f547cff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.SettingsToggles
+  m_music: {fileID: 731973822}
+  m_lights:
+  - {fileID: 294409291}
+  - {fileID: 540250554}
+  - {fileID: 1899630878}
+  - {fileID: 960507604}
+  - {fileID: 1422581884}
+  - {fileID: 168288829}
+  - {fileID: 1151077596}
+  - {fileID: 2064702196}
+  m_addLight: {fileID: 969065499}
 --- !u!4 &767419126 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8095585626818792433, guid: 65473cbb43b31634cb46811c954e5c6a, type: 3}
@@ -3783,7 +3807,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1013874018}
-  - component: {fileID: 1013874019}
+  - component: {fileID: 1013874021}
+  - component: {fileID: 1013874022}
+  - component: {fileID: 1013874024}
+  - component: {fileID: 1013874023}
   m_Layer: 5
   m_Name: ButtonManager
   m_TagString: Untagged
@@ -3810,7 +3837,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1013874019
+--- !u!114 &1013874021
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3819,33 +3846,69 @@ MonoBehaviour:
   m_GameObject: {fileID: 1013874017}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d5d93be4565c3469842ee2c17e1f1e, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b4353e64112abc4fac4247074c8abe5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.MenuButton
-  m_sceneName: GameScene
-  m_menuSceneName: Menu
-  m_music: {fileID: 731973822}
-  m_scoreText: {fileID: 0}
-  m_menuBackgroud: {fileID: 1374537719}
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.PauseMenu
+  m_menuBackground: {fileID: 1374537719}
   m_pauseButton: {fileID: 602778257}
+  m_settingsMenu: {fileID: 1013874022}
+--- !u!114 &1013874022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013874017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b150e4b6bf6f1419da943ac9160a2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.SettingsMenu
   m_backButton: {fileID: 20416848}
   m_menuButtons:
   - {fileID: 1812086905}
   - {fileID: 1357115559}
   - {fileID: 17246121}
-  m_settingsButton:
+  m_settingsButtons:
   - {fileID: 1281841605}
   - {fileID: 1569949}
+--- !u!114 &1013874023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013874017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd591d6ae75cef14cb739e833f547cff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.SettingsToggles
+  m_music: {fileID: 731973822}
   m_lights:
   - {fileID: 294409291}
-  - {fileID: 1151077596}
-  - {fileID: 2064702196}
-  - {fileID: 168288829}
   - {fileID: 540250554}
-  - {fileID: 1422581884}
   - {fileID: 1899630878}
   - {fileID: 960507604}
+  - {fileID: 1422581884}
+  - {fileID: 168288829}
+  - {fileID: 1151077596}
+  - {fileID: 2064702196}
   m_addLight: {fileID: 969065499}
+--- !u!114 &1013874024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013874017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45cedf8d95cdfdd4fa19436b87d8ffb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.SceneLoader
+  m_gameSceneName: GameScene
+  m_menuSceneName: Menu
 --- !u!1 &1049467842 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 768528759832394618, guid: 5e630ce0b626da14cad61fbb2670f9fa, type: 3}
@@ -4151,7 +4214,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.38251945, y: 0.5, z: 0.1613022}
+  m_Size: {x: 0.38251945, y: 0.2, z: 0.1613022}
   m_Center: {x: 0.07692526, y: 1.1, z: -0.000000007334852}
 --- !u!1 &1199950031 stripped
 GameObject:
@@ -4342,9 +4405,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: LightSettings
+      - m_Target: {fileID: 1013874023}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.SettingsToggles, Assembly-CSharp
+        m_MethodName: ToggleLight
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4759,9 +4822,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: OpenSettings
+      - m_Target: {fileID: 1013874022}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.SettingsMenu, Assembly-CSharp
+        m_MethodName: Open
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4821,7 +4884,7 @@ GameObject:
   - component: {fileID: 1374537722}
   - component: {fileID: 1374537721}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: MenuBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5927,6 +5990,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pinata
       objectReference: {fileID: 0}
+    - target: {fileID: 7869948794530678559, guid: ac938c405cc953f4ba990fe3a5ae94ae, type: 3}
+      propertyPath: m_Name
+      value: Pinata
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6650855107457326896, guid: ac938c405cc953f4ba990fe3a5ae94ae, type: 3}
@@ -6187,6 +6254,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1718907121}
+  - component: {fileID: 1718907122}
   m_Layer: 0
   m_Name: StoneSpawner
   m_TagString: Untagged
@@ -6209,6 +6277,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1718907122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718907120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8a977acd9770e64abb5735746f11dbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.SpawnRocks.RockSpawner
+  m_rockPrefabs:
+  - {fileID: 6081886522364738903, guid: e04385e4a520a504b89162d2e65b6ddd, type: 3}
+  - {fileID: 5339592161661053185, guid: 18de0378d6aefb643b2f5c5c78a93304, type: 3}
+  m_spawnPoint: {fileID: 1718907121}
 --- !u!1001 &1744211205
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6697,9 +6781,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1013874019}
-        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.MenuButton, Assembly-CSharp
-        m_MethodName: ContnueBut
+      - m_Target: {fileID: 1013874021}
+        m_TargetAssemblyTypeName: Golf.ScriptsGolf.Buttons.PauseMenu, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7959,7 +8043,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2141263382}
-  - component: {fileID: 2141263381}
+  - component: {fileID: 2141263383}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -7967,42 +8051,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2141263381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2141263380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae7c2eaca63f6e642b3ad4a85689b3f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.GameManager
-  m_rockPrefabs:
-  - {fileID: 6081886522364738903, guid: e04385e4a520a504b89162d2e65b6ddd, type: 3}
-  - {fileID: 5339592161661053185, guid: 18de0378d6aefb643b2f5c5c78a93304, type: 3}
-  m_spawnPoint: {fileID: 1718907121}
-  m_prefabSettings: []
-  m_playerAnimator: {fileID: 1984897410}
-  m_player: {fileID: 2012276397}
-  m_hoeHeadCollider: {fileID: 1184219147}
-  m_rockLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  m_hitForce: 15
-  m_upwardForce: 1.5
-  m_shootButton: {fileID: 125783858}
-  m_swingDirection: {x: 0, y: 0, z: 1}
-  m_minHitSpeed: 1.5
-  m_velocitySmoothing: 0.5
-  m_pointCount: {fileID: 1009138619}
-  m_menuSceneName: Menu
-  m_gameOverDelay: 1
-  m_indicatorSlider: {fileID: 1501830581}
-  m_indicatorTopY: 4.49
-  m_indicatorBottomY: 0.5
-  m_indicatorZones: []
 --- !u!4 &2141263382
 Transform:
   m_ObjectHideFlags: 0
@@ -8018,6 +8066,40 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2141263383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2141263380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc2cb28ead5f9845b40845a1822f790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Source.Bootstrap
+  m_rockSpawner: {fileID: 1718907122}
+  m_pinata: {fileID: 309168943}
+  m_playerAnimator: {fileID: 1984897410}
+  m_player: {fileID: 2012276397}
+  m_hoe:
+    headCollider: {fileID: 1184219147}
+    rockLayer:
+      serializedVersion: 2
+      m_Bits: 128
+    hitForce: 15
+    upwardForce: 1.5
+    swingDirection: {x: 0, y: 0, z: 1}
+    minHitSpeed: 1
+    velocitySmoothing: 0.5
+  m_shootButton: {fileID: 125783858}
+  m_pointCount: {fileID: 1009138619}
+  m_indicatorSlider: {fileID: 1501830581}
+  m_indicatorTopY: 4.49
+  m_indicatorBottomY: 0.5
+  m_indicatorZones: []
+  m_menuSceneName: Menu
+  m_gameOverDelay: 1.5
 --- !u!1001 &8559416411700044268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8109,7 +8191,15 @@ PrefabInstance:
     - target: {fileID: 8354098676511545145, guid: 50d82c751be0aa941999bb65887b3baf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1013874019}
+      objectReference: {fileID: 1013874022}
+    - target: {fileID: 8354098676511545145, guid: 50d82c751be0aa941999bb65887b3baf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Close
+      objectReference: {fileID: 0}
+    - target: {fileID: 8354098676511545145, guid: 50d82c751be0aa941999bb65887b3baf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Golf.ScriptsGolf.Buttons.SettingsMenu, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 9139312216736198524, guid: 50d82c751be0aa941999bb65887b3baf, type: 3}
       propertyPath: m_Name
       value: BackButton

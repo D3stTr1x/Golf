@@ -5,6 +5,8 @@ namespace Golf.ScriptsGolf.ShootScripts
 {
     public class Pinata : MonoBehaviour
     {
+        public event System.Action Hit;
+
         private void OnCollisionEnter(Collision collision)
         {
             RockSpawnSettings ball = collision.collider.GetComponentInParent<RockSpawnSettings>();
@@ -15,7 +17,7 @@ namespace Golf.ScriptsGolf.ShootScripts
             }
 
             ball.isScored = true;
-            GameEvents.RaisePinataHit();
+            Hit?.Invoke();
         }
     }
 }

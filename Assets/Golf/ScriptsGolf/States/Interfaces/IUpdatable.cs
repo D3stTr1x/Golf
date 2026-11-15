@@ -1,6 +1,7 @@
-using UnityEngine;
-
-public class IUpdatable
+namespace Golf.ScriptsGolf.States.Interfaces
 {
-    
+    public interface IUpdatable
+    {
+        void Update();
+    }
 }

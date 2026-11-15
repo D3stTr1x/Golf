@@ -1,6 +1,8 @@
-using UnityEngine;
-
-public class IGameState
+namespace Golf.ScriptsGolf.States.Interfaces
 {
-    
+    public interface IGameState
+    {
+        void Enter();
+        void Exit();
+    }
 }

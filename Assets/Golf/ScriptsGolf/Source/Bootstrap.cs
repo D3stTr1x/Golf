@@ -56,7 +56,7 @@ namespace Golf.ScriptsGolf.Source
             var scoreView = new ScoreView(m_pointCount, score);
             var indicator = new BallIndicator(m_indicatorSlider, m_indicatorTopY, m_indicatorBottomY, m_indicatorZones);
             var animation = new GolfShootAnimation(m_playerAnimator, m_player, "Shoot", "Idle");
-            var hoe = new HoeHitHandler(m_hoe, animation);
+            var hoe = new HoeHitHandler(m_hoe, animation, m_pinata.transform);
             var input = new ShootInput(m_shootButton);
 
             m_stateMachine.Register(new GamePlayState(

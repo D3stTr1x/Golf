@@ -87,12 +87,11 @@ namespace Golf.ScriptsGolf.States
         private void OnShootPressed()
         {
             m_indicator.Freeze();
-            m_hoe.ResetHits();
+            m_hoe.BeginSwing(m_indicator.CurrentZone);
             m_animation.Press();
         }
 
         private void OnShootReleased() => m_animation.Release();
-
 
         private void OnPinataHit()
         {

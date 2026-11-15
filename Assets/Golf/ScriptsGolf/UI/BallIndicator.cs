@@ -4,10 +4,19 @@ using UnityEngine.UI;
 
 namespace Golf.ScriptsGolf.UI
 {
+    public enum ZoneType
+    {
+        Miss,
+        BallHigh,
+        BallLow,
+        Pinata
+    }
+
     [Serializable]
     public class BallIndicatorZone
     {
         public string name;
+        public ZoneType type;
         [Range(0f, 1f)] public float from;
         [Range(0f, 1f)] public float to;
         public Color color = Color.white;
@@ -21,6 +30,7 @@ namespace Golf.ScriptsGolf.UI
         private bool m_isFrozen;
         private Transform m_target;
         private RectTransform m_marker;
+        private BallIndicatorZone[] m_zones;
 
         public BallIndicator(Slider slider, float topY, float bottomY, BallIndicatorZone[] zones)
         {
@@ -36,9 +46,29 @@ namespace Golf.ScriptsGolf.UI
             m_slider.transition = Selectable.Transition.None;
             m_slider.value = 0f;
 
-            BuildZones(zones != null && zones.Length > 0 ? zones : DefaultZones());
+            m_zones = zones != null && zones.Length > 0 ? zones : DefaultZones();
+            BuildZones(m_zones);
 
             SetValue(0f);
+        }
+
+        // Зона, в которой сейчас стоит маркер (после Freeze это зона на момент нажатия)
+        public ZoneType CurrentZone
+        {
+            get
+            {
+                float value = m_slider.value;
+
+                foreach (BallIndicatorZone zone in m_zones)
+                {
+                    if (value >= Mathf.Min(zone.from, zone.to) && value <= Mathf.Max(zone.from, zone.to))
+                    {
+                        return zone.type;
+                    }
+                }
+
+                return ZoneType.Miss;
+            }
         }
 
         public void Track(Transform ball)
@@ -142,11 +172,11 @@ namespace Golf.ScriptsGolf.UI
         {
             return new[]
             {
-                new BallIndicatorZone { name = "Miss Top", from = 0.75f, to = 1.00f, color = Color.red },
-                new BallIndicatorZone { name = "Ball Top", from = 0.67f, to = 0.75f, color = Color.blue },
-                new BallIndicatorZone { name = "Pinata", from = 0.58f, to = 0.67f, color = Color.green },
-                new BallIndicatorZone { name = "Ball Bottom", from = 0.50f, to = 0.58f, color = Color.blue },
-                new BallIndicatorZone { name = "Miss Bottom", from = 0.00f, to = 0.50f, color = Color.red },
+                new BallIndicatorZone { name = "Miss Top", type = ZoneType.Miss, from = 0.75f, to = 1.00f, color = Color.red },
+                new BallIndicatorZone { name = "Ball Top", type = ZoneType.BallHigh, from = 0.67f, to = 0.75f, color = Color.blue },
+                new BallIndicatorZone { name = "Pinata", type = ZoneType.Pinata, from = 0.58f, to = 0.67f, color = Color.green },
+                new BallIndicatorZone { name = "Ball Bottom", type = ZoneType.BallLow, from = 0.50f, to = 0.58f, color = Color.blue },
+                new BallIndicatorZone { name = "Miss Bottom", type = ZoneType.Miss, from = 0.00f, to = 0.50f, color = Color.red },
             };
         }
     }

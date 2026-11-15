@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Golf.ScriptsGolf.SpawnRocks;
 using Golf.ScriptsGolf.States.Interfaces;
+using Golf.ScriptsGolf.UI;
 using UnityEngine;
 
 namespace Golf.ScriptsGolf.ShootScripts
@@ -11,23 +12,28 @@ namespace Golf.ScriptsGolf.ShootScripts
 
         private readonly HoeHitSettings m_settings;
         private readonly GolfShootAnimation m_animation;
+        private readonly Transform m_target;
         private readonly HashSet<int> m_hitRocks = new HashSet<int>();
+        private readonly List<Collider> m_ignored = new List<Collider>();
 
         private Vector3 m_prevHeadPos;
         private Vector3 m_headVelocity;
         private bool m_hasPrevPos;
+        private ZoneType m_zone = ZoneType.Miss;
 
-
-
-        private Rigidbody m_lastHit;
-
-        public HoeHitHandler(HoeHitSettings settings, GolfShootAnimation animation)
+        public HoeHitHandler(HoeHitSettings settings, GolfShootAnimation animation, Transform target)
         {
             m_settings = settings;
             m_animation = animation;
+            m_target = target;
         }
 
-        public void ResetHits() => m_hitRocks.Clear();
+        public void BeginSwing(ZoneType zone)
+        {
+            RestoreCollisions();
+            m_hitRocks.Clear();
+            m_zone = zone;
+        }
 
         public void LateUpdate()
         {
@@ -52,21 +58,18 @@ namespace Golf.ScriptsGolf.ShootScripts
 
         public void FixedUpdate()
         {
+            BoxCollider head = m_settings.headCollider;
+            Transform headTransform = head.transform;
+            Vector3 scale = headTransform.lossyScale;
+            Vector3 halfExtents = Vector3.Scale(
+                head.size,
+                new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) * 0.5f;
+            halfExtents += Vector3.one * m_settings.hitBoxPadding;
 
-
-            if (m_lastHit != null)
-            {
-                Debug.Log($"after: vel={m_lastHit.linearVelocity}");
-                m_lastHit = null;
-            }
-
-
-
-            Bounds bounds = m_settings.headCollider.bounds;
             Collider[] hits = Physics.OverlapBox(
-                bounds.center,
-                bounds.extents,
-                Quaternion.identity,
+                headTransform.TransformPoint(head.center),
+                halfExtents,
+                headTransform.rotation,
                 m_settings.rockLayer,
                 QueryTriggerInteraction.Ignore);
 
@@ -91,8 +94,6 @@ namespace Golf.ScriptsGolf.ShootScripts
                 return;
             }
 
-            Vector3 hitDir = (swingDir + Vector3.up * m_settings.upwardForce).normalized;
-
             foreach (Collider hit in hits)
             {
                 Rigidbody body = hit.attachedRigidbody;
@@ -107,11 +108,64 @@ namespace Golf.ScriptsGolf.ShootScripts
                     continue;
                 }
 
-                Debug.Log($"hit: ballPos={body.position} headCenter={bounds.center} ballVel={body.linearVelocity}");
-                body.AddForce(hitDir * m_settings.hitForce, ForceMode.Impulse);
-                m_lastHit = body;
+                Hit(body, swingDir);
                 StoneHit?.Invoke();
             }
+        }
+
+        private void Hit(Rigidbody body, Vector3 swingDir)
+        {
+            switch (m_zone)
+            {
+                case ZoneType.Pinata:
+                    LaunchToTarget(body);
+                    break;
+                case ZoneType.BallHigh:
+                    Impulse(body, swingDir, m_settings.upwardForce * m_settings.highZoneUpwardMultiplier);
+                    break;
+                case ZoneType.BallLow:
+                    Impulse(body, swingDir, m_settings.upwardForce * m_settings.lowZoneUpwardMultiplier);
+                    break;
+                default:
+                    Impulse(body, swingDir, m_settings.upwardForce);
+                    break;
+            }
+        }
+
+        private void Impulse(Rigidbody body, Vector3 swingDir, float upward)
+        {
+            Vector3 dir = (swingDir + Vector3.up * upward).normalized;
+            body.AddForce(dir * m_settings.hitForce, ForceMode.Impulse);
+        }
+
+        private void LaunchToTarget(Rigidbody body)
+        {
+            Vector3 aim = m_target.position + m_settings.pinataAimOffset;
+            float time = Mathf.Max(0.05f, m_settings.pinataFlightTime);
+
+            Vector3 velocity = (aim - body.position) / time - 0.5f * Physics.gravity * time;
+
+            body.linearVelocity = velocity;
+            body.angularVelocity = Vector3.zero;
+
+            foreach (Collider c in body.GetComponentsInChildren<Collider>())
+            {
+                Physics.IgnoreCollision(m_settings.headCollider, c, true);
+                m_ignored.Add(c);
+            }
+        }
+
+        private void RestoreCollisions()
+        {
+            foreach (Collider c in m_ignored)
+            {
+                if (c != null)
+                {
+                    Physics.IgnoreCollision(m_settings.headCollider, c, false);
+                }
+            }
+
+            m_ignored.Clear();
         }
     }
 }

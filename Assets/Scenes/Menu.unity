@@ -1870,6 +1870,7 @@ GameObject:
   - component: {fileID: 1007535325}
   - component: {fileID: 1007535324}
   - component: {fileID: 1007535323}
+  - component: {fileID: 1007535327}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1962,6 +1963,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1007535327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007535322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c868e7735c4c3d4dbbd31e14b780eb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Golf.ScriptsGolf.Buttons.ScoreBoard
+  m_scoreText: {fileID: 1574712486}
 --- !u!4 &1038750939 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 087684e94b3539946a37cf9ffa588bf5, type: 3}

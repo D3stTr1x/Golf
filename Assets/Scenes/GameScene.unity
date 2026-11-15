@@ -4214,7 +4214,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.38251945, y: 0.2, z: 0.1613022}
+  m_Size: {x: 0.38251945, y: 0.5, z: 0.1613022}
   m_Center: {x: 0.07692526, y: 1.1, z: -0.000000007334852}
 --- !u!1 &1199950031 stripped
 GameObject:
@@ -8092,6 +8092,11 @@ MonoBehaviour:
     swingDirection: {x: 0, y: 0, z: 1}
     minHitSpeed: 1
     velocitySmoothing: 0.5
+    hitBoxPadding: 0
+    pinataFlightTime: 0.8
+    pinataAimOffset: {x: 0, y: 0, z: 0}
+    highZoneUpwardMultiplier: 1
+    lowZoneUpwardMultiplier: 0.2
   m_shootButton: {fileID: 125783858}
   m_pointCount: {fileID: 1009138619}
   m_indicatorSlider: {fileID: 1501830581}

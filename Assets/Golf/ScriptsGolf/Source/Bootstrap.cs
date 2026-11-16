@@ -1,3 +1,4 @@
+using Golf.ScriptsGolf.Effects;
 using Golf.ScriptsGolf.ShootScripts;
 using Golf.ScriptsGolf.SpawnRocks;
 using Golf.ScriptsGolf.States;
@@ -35,13 +36,21 @@ namespace Golf.ScriptsGolf.Source
         [SerializeField] private string m_menuSceneName = "Menu";
         [SerializeField] private float m_gameOverDelay = 1.5f;
 
+        [Header("Победа")]
+        [SerializeField] private int m_scoreToWin = 50;
+        [SerializeField] private PinataEffects m_pinataEffects;
+        [SerializeField] private WinMessage m_winMessage;
+        [Tooltip("Через сколько секунд после победы уйти в меню. 0 = не уходить автоматически")]
+        [SerializeField] private float m_winMenuDelay = 5f;
+
         private StateMachine m_stateMachine;
 
         private void Awake()
         {
             if (m_playerAnimator == null || m_player == null ||
                 m_hoe.headCollider == null || m_indicatorSlider == null ||
-                m_rockSpawner == null || m_pinata == null)
+                m_rockSpawner == null || m_pinata == null ||
+                m_pinataEffects == null || m_winMessage == null)
             {
                 Debug.LogError("Bootstrap: назначьте все обязательные поля в Inspector.");
                 enabled = false;
@@ -49,6 +58,7 @@ namespace Golf.ScriptsGolf.Source
             }
 
             Time.timeScale = 1f;
+            m_winMessage.Hide();
 
             m_stateMachine = new StateMachine();
 
@@ -60,9 +70,12 @@ namespace Golf.ScriptsGolf.Source
             var input = new ShootInput(m_shootButton);
 
             m_stateMachine.Register(new GamePlayState(
-                m_stateMachine, m_rockSpawner, m_pinata, score, indicator, input, animation, hoe));
+                m_stateMachine, m_rockSpawner, m_pinata, score, indicator, input, animation, hoe,
+                m_pinataEffects, m_scoreToWin));
             m_stateMachine.Register(new GameOverState(
                 this, score, m_menuSceneName, m_gameOverDelay));
+            m_stateMachine.Register(new GameWinState(
+                this, score, m_pinataEffects, m_winMessage, m_menuSceneName, m_winMenuDelay));
         }
 
         private void Start() => m_stateMachine.ChangeState<GamePlayState>();

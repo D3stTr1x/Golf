@@ -8,6 +8,8 @@ namespace Golf.ScriptsGolf.ShootScripts
 {
     public class HoeHitHandler : IFixedUpdatable, ILateUpdatable
     {
+        private const float MaxSweepDistance = 1.5f;
+
         public event System.Action StoneHit;
 
         private readonly HoeHitSettings m_settings;
@@ -15,10 +17,15 @@ namespace Golf.ScriptsGolf.ShootScripts
         private readonly Transform m_target;
         private readonly HashSet<int> m_hitRocks = new HashSet<int>();
         private readonly List<Collider> m_ignored = new List<Collider>();
+        private readonly HashSet<Collider> m_candidates = new HashSet<Collider>();
 
         private Vector3 m_prevHeadPos;
         private Vector3 m_headVelocity;
         private bool m_hasPrevPos;
+
+        private Vector3 m_prevCenter;
+        private bool m_hasPrevCenter;
+
         private ZoneType m_zone = ZoneType.Miss;
 
         public HoeHitHandler(HoeHitSettings settings, GolfShootAnimation animation, Transform target)
@@ -58,22 +65,9 @@ namespace Golf.ScriptsGolf.ShootScripts
 
         public void FixedUpdate()
         {
-            BoxCollider head = m_settings.headCollider;
-            Transform headTransform = head.transform;
-            Vector3 scale = headTransform.lossyScale;
-            Vector3 halfExtents = Vector3.Scale(
-                head.size,
-                new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) * 0.5f;
-            halfExtents += Vector3.one * m_settings.hitBoxPadding;
+            FindCandidates();
 
-            Collider[] hits = Physics.OverlapBox(
-                headTransform.TransformPoint(head.center),
-                halfExtents,
-                headTransform.rotation,
-                m_settings.rockLayer,
-                QueryTriggerInteraction.Ignore);
-
-            foreach (Collider hit in hits)
+            foreach (Collider hit in m_candidates)
             {
                 RockSpawnSettings rock = hit.GetComponentInParent<RockSpawnSettings>();
                 if (rock != null)
@@ -94,7 +88,7 @@ namespace Golf.ScriptsGolf.ShootScripts
                 return;
             }
 
-            foreach (Collider hit in hits)
+            foreach (Collider hit in m_candidates)
             {
                 Rigidbody body = hit.attachedRigidbody;
 
@@ -111,6 +105,54 @@ namespace Golf.ScriptsGolf.ShootScripts
                 Hit(body, swingDir);
                 StoneHit?.Invoke();
             }
+        }
+
+        private void FindCandidates()
+        {
+            m_candidates.Clear();
+
+            BoxCollider head = m_settings.headCollider;
+            Transform headTransform = head.transform;
+            Vector3 scale = headTransform.lossyScale;
+            Vector3 halfExtents = Vector3.Scale(
+                head.size,
+                new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) * 0.5f;
+            halfExtents += Vector3.one * m_settings.hitBoxPadding;
+
+            Vector3 center = headTransform.TransformPoint(head.center);
+            Quaternion rotation = headTransform.rotation;
+
+            foreach (Collider c in Physics.OverlapBox(
+                center, halfExtents, rotation, m_settings.rockLayer, QueryTriggerInteraction.Ignore))
+            {
+                m_candidates.Add(c);
+            }
+
+            if (m_animation.IsPlaying && m_hasPrevCenter)
+            {
+                Vector3 delta = center - m_prevCenter;
+                float distance = delta.magnitude;
+
+                if (distance > 0.001f && distance < MaxSweepDistance)
+                {
+                    RaycastHit[] swept = Physics.BoxCastAll(
+                        m_prevCenter,
+                        halfExtents,
+                        delta / distance,
+                        rotation,
+                        distance,
+                        m_settings.rockLayer,
+                        QueryTriggerInteraction.Ignore);
+
+                    foreach (RaycastHit h in swept)
+                    {
+                        m_candidates.Add(h.collider);
+                    }
+                }
+            }
+
+            m_prevCenter = center;
+            m_hasPrevCenter = m_animation.IsPlaying;
         }
 
         private void Hit(Rigidbody body, Vector3 swingDir)

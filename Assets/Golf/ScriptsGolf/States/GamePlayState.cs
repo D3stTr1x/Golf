@@ -1,3 +1,4 @@
+using Golf.ScriptsGolf.Effects;
 using Golf.ScriptsGolf.ShootScripts;
 using Golf.ScriptsGolf.SpawnRocks;
 using Golf.ScriptsGolf.States.Interfaces;
@@ -8,7 +9,7 @@ namespace Golf.ScriptsGolf.States
 {
     public class GamePlayState : IGameState, IActivate, IUpdatable, IFixedUpdatable, ILateUpdatable
     {
-        private const int c_PointsPerDifficultyStep = 10;
+        private const int PointsPerDifficultyStep = 10;
 
         private readonly StateMachine m_stateMachine;
         private readonly RockSpawner m_spawner;
@@ -18,6 +19,8 @@ namespace Golf.ScriptsGolf.States
         private readonly ShootInput m_input;
         private readonly GolfShootAnimation m_animation;
         private readonly HoeHitHandler m_hoe;
+        private readonly PinataEffects m_effects;
+        private readonly int m_scoreToWin;
 
         public GamePlayState(
             StateMachine stateMachine,
@@ -27,7 +30,9 @@ namespace Golf.ScriptsGolf.States
             BallIndicator indicator,
             ShootInput input,
             GolfShootAnimation animation,
-            HoeHitHandler hoe)
+            HoeHitHandler hoe,
+            PinataEffects effects,
+            int scoreToWin)
         {
             m_stateMachine = stateMachine;
             m_spawner = spawner;
@@ -37,6 +42,8 @@ namespace Golf.ScriptsGolf.States
             m_input = input;
             m_animation = animation;
             m_hoe = hoe;
+            m_effects = effects;
+            m_scoreToWin = scoreToWin;
         }
 
         public void Enter()
@@ -58,6 +65,7 @@ namespace Golf.ScriptsGolf.States
             m_spawner.RockSpawned += OnRockSpawned;
             m_input.Pressed += OnShootPressed;
             m_input.Released += OnShootReleased;
+            m_hoe.StoneHit += OnStoneHit;
 
             m_input.Activate();
         }
@@ -71,6 +79,7 @@ namespace Golf.ScriptsGolf.States
             m_spawner.RockSpawned -= OnRockSpawned;
             m_input.Pressed -= OnShootPressed;
             m_input.Released -= OnShootReleased;
+            m_hoe.StoneHit -= OnStoneHit;
         }
 
         public void Update()
@@ -86,18 +95,35 @@ namespace Golf.ScriptsGolf.States
 
         private void OnShootPressed()
         {
-            m_indicator.Freeze();
-            m_hoe.BeginSwing(m_indicator.CurrentZone);
+            // Повторные нажатия во время замаха не должны менять зону и сбрасывать побитые мячи
+            if (!m_animation.IsPlaying)
+            {
+                m_indicator.Freeze();
+                m_hoe.BeginSwing(m_indicator.CurrentZone);
+            }
+
             m_animation.Press();
         }
 
         private void OnShootReleased() => m_animation.Release();
 
+        private void OnStoneHit()
+        {
+            // Мотыга ударила по камню: сюда можно повесить звук/эффекты
+        }
+
         private void OnPinataHit()
         {
             m_score.Add();
+            m_effects.PlayHit();
 
-            if (m_score.Current % c_PointsPerDifficultyStep == 0)
+            if (m_score.Current >= m_scoreToWin)
+            {
+                m_stateMachine.ChangeState<GameWinState>();
+                return;
+            }
+
+            if (m_score.Current % PointsPerDifficultyStep == 0)
             {
                 m_spawner.IncreaseDifficulty();
             }

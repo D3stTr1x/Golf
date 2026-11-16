@@ -12,14 +12,15 @@ namespace Golf.ScriptsGolf.Effects
         [SerializeField] private ParticleSystem m_hitParticles;
         [SerializeField] private AudioClip m_hitClip;
         [Tooltip("Сюда можно повесить любые свои эффекты: анимацию качания, вспышку, тряску камеры")]
-        [SerializeField] private UnityEvent m_onHit;
+        private UnityEvent m_onHit;
 
         [Header("Победа")]
         [SerializeField] private ParticleSystem m_breakParticles;
         [SerializeField] private AudioClip m_breakClip;
-        [SerializeField] private UnityEvent m_onBreak;
+        
         [SerializeField] private GameObject m_target;
         [SerializeField] private float m_hideDelay = 0.3f;
+        private UnityEvent m_onBreak;
 
         public void PlayHit()
         {

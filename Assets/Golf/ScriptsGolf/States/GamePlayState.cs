@@ -65,7 +65,6 @@ namespace Golf.ScriptsGolf.States
             m_spawner.RockSpawned += OnRockSpawned;
             m_input.Pressed += OnShootPressed;
             m_input.Released += OnShootReleased;
-            m_hoe.StoneHit += OnStoneHit;
 
             m_input.Activate();
         }
@@ -79,7 +78,6 @@ namespace Golf.ScriptsGolf.States
             m_spawner.RockSpawned -= OnRockSpawned;
             m_input.Pressed -= OnShootPressed;
             m_input.Released -= OnShootReleased;
-            m_hoe.StoneHit -= OnStoneHit;
         }
 
         public void Update()
@@ -95,7 +93,6 @@ namespace Golf.ScriptsGolf.States
 
         private void OnShootPressed()
         {
-            // Повторные нажатия во время замаха не должны менять зону и сбрасывать побитые мячи
             if (!m_animation.IsPlaying)
             {
                 m_indicator.Freeze();
@@ -106,11 +103,6 @@ namespace Golf.ScriptsGolf.States
         }
 
         private void OnShootReleased() => m_animation.Release();
-
-        private void OnStoneHit()
-        {
-            // Мотыга ударила по камню: сюда можно повесить звук/эффекты
-        }
 
         private void OnPinataHit()
         {

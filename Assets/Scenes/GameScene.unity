@@ -8430,9 +8430,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 128
     hitForce: 15
-    upwardForce: 1.5
+    upwardForce: 1
     swingDirection: {x: 0, y: 0, z: 1}
-    minHitSpeed: 0.2
     velocitySmoothing: 0.5
     hitBoxPadding: 0
     pinataFlightTime: 0.8

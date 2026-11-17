@@ -70,7 +70,7 @@ namespace Golf.ScriptsGolf.ShootScripts
             foreach (Collider hit in m_candidates)
             {
                 RockSpawnSettings rock = hit.GetComponentInParent<RockSpawnSettings>();
-                if (rock != null)
+                if (rock != null && m_zone != ZoneType.Miss)
                 {
                     rock.isTouch = true;
                 }
@@ -82,11 +82,6 @@ namespace Golf.ScriptsGolf.ShootScripts
             }
 
             Vector3 swingDir = m_settings.swingDirection.normalized;
-
-            if (Vector3.Dot(m_headVelocity, swingDir) < m_settings.minHitSpeed)
-            {
-                return;
-            }
 
             foreach (Collider hit in m_candidates)
             {
@@ -163,13 +158,12 @@ namespace Golf.ScriptsGolf.ShootScripts
                     LaunchToTarget(body);
                     break;
                 case ZoneType.BallHigh:
-                    Impulse(body, swingDir, m_settings.upwardForce * m_settings.highZoneUpwardMultiplier);
+                    LaunchToHigh(body);
                     break;
                 case ZoneType.BallLow:
                     Impulse(body, swingDir, m_settings.upwardForce * m_settings.lowZoneUpwardMultiplier);
                     break;
                 default:
-                    Impulse(body, swingDir, m_settings.upwardForce);
                     break;
             }
         }
@@ -180,9 +174,21 @@ namespace Golf.ScriptsGolf.ShootScripts
             body.AddForce(dir * m_settings.hitForce, ForceMode.Impulse);
         }
 
+        private void LaunchToHigh(Rigidbody body)
+        {
+            Vector3 m_high = m_target.position + Vector3.up * 2f;
+            Vector3 aim = m_high + m_settings.pinataAimOffset;
+            Launch(body, aim);
+        }
+
         private void LaunchToTarget(Rigidbody body)
         {
             Vector3 aim = m_target.position + m_settings.pinataAimOffset;
+            Launch(body, aim);
+        }
+
+        private void Launch(Rigidbody body, Vector3 aim)
+        {
             float time = Mathf.Max(0.05f, m_settings.pinataFlightTime);
 
             Vector3 velocity = (aim - body.position) / time - 0.5f * Physics.gravity * time;

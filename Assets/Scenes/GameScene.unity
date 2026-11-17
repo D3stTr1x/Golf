@@ -1551,14 +1551,8 @@ MonoBehaviour:
   m_audioSource: {fileID: 1796308831}
   m_hitParticles: {fileID: 2507985994667805083}
   m_hitClip: {fileID: 8300000, guid: b20982404ef85c548b29e303c15d58aa, type: 3}
-  m_onHit:
-    m_PersistentCalls:
-      m_Calls: []
   m_breakParticles: {fileID: 7310339703766349965}
   m_breakClip: {fileID: 8300000, guid: 7569f46ab439d004187c2ceac26025aa, type: 3}
-  m_onBreak:
-    m_PersistentCalls:
-      m_Calls: []
   m_target: {fileID: 163142382}
   m_hideDelay: 0.3
 --- !u!1001 &312597537
@@ -4401,7 +4395,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -8438,7 +8432,7 @@ MonoBehaviour:
     hitForce: 15
     upwardForce: 1.5
     swingDirection: {x: 0, y: 0, z: 1}
-    minHitSpeed: 0.5
+    minHitSpeed: 0.2
     velocitySmoothing: 0.5
     hitBoxPadding: 0
     pinataFlightTime: 0.8

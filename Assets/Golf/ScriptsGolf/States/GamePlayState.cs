@@ -95,6 +95,7 @@ namespace Golf.ScriptsGolf.States
         {
             if (!m_animation.IsPlaying)
             {
+                m_indicator.Tick();
                 m_indicator.Freeze();
                 m_hoe.BeginSwing(m_indicator.CurrentZone);
             }

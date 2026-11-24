@@ -67,6 +67,11 @@ namespace Golf.ScriptsGolf.ShootScripts
         {
             FindCandidates();
 
+            if (!m_animation.CanHit)
+            {
+                return;
+            }
+
             foreach (Collider hit in m_candidates)
             {
                 RockSpawnSettings rock = hit.GetComponentInParent<RockSpawnSettings>();
@@ -74,11 +79,6 @@ namespace Golf.ScriptsGolf.ShootScripts
                 {
                     rock.isTouch = true;
                 }
-            }
-
-            if (!m_animation.IsPlaying)
-            {
-                return;
             }
 
             Vector3 swingDir = m_settings.swingDirection.normalized;

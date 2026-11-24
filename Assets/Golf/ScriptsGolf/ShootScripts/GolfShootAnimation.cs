@@ -6,6 +6,7 @@ namespace Golf.ScriptsGolf.ShootScripts
     public class GolfShootAnimation : IUpdatable
     {
         private static readonly int ShootTrigger = Animator.StringToHash("Shoot");
+        private const float MaxHoldDuration = 0.5f;
 
         private enum Phase
         {
@@ -26,8 +27,15 @@ namespace Golf.ScriptsGolf.ShootScripts
         private Vector3 m_originalPosition;
         private Quaternion m_originalRotation;
         private bool m_buttonHeld;
+        private float m_holdTimer;
 
         public bool IsPlaying => m_phase != Phase.None;
+
+        // Удар разрешён во время замаха и ограниченного удержания в верхней точке.
+        public bool CanHit =>
+            m_phase == Phase.WaitingForShootState ||
+            m_phase == Phase.Shooting ||
+            (m_phase == Phase.Holding && m_holdTimer < MaxHoldDuration);
 
         public GolfShootAnimation(
             Animator animator,
@@ -87,6 +95,7 @@ namespace Golf.ScriptsGolf.ShootScripts
                     if (m_buttonHeld)
                     {
                         m_animator.speed = 0f;
+                        m_holdTimer = 0f;
                         m_phase = Phase.Holding;
                     }
                     else
@@ -95,10 +104,19 @@ namespace Golf.ScriptsGolf.ShootScripts
                     }
                 }
             }
-            else if (m_phase == Phase.Holding && !m_buttonHeld)
+            else if (m_phase == Phase.Holding)
             {
-                m_animator.speed = m_defaultAnimatorSpeed;
-                StartReturn();
+                if (m_buttonHeld)
+                {
+                    m_holdTimer += Time.deltaTime;
+                }
+
+                if (!m_buttonHeld || m_holdTimer >= MaxHoldDuration)
+                {
+                    m_buttonHeld = false;
+                    m_animator.speed = m_defaultAnimatorSpeed;
+                    StartReturn();
+                }
             }
 
             if (m_phase == Phase.WaitingForIdleState && IsInState(m_idleStateHash))
